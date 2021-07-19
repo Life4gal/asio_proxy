@@ -18,6 +18,7 @@ namespace proxy
 	using port_type = unsigned short;
 
 	class bridge;
+
 	using bridge_type = std::shared_ptr<bridge>;
 	using acceptor_type = boost::asio::ip::tcp::acceptor;
 

@@ -21,8 +21,8 @@ namespace proxy
 		local_port_(local_port),
 		forward_host_(forward_host),
 		forward_port_(forward_port),
-		acceptor_(io_service_, ip::tcp::endpoint(ip::make_address(local_host_), local_port_))
-	/*, session_(nullptr)*/ // todo: this will raise an std::bad_weak_ptr exception
+		acceptor_(io_service_, ip::tcp::endpoint(ip::make_address(local_host_), local_port_)),
+		session_(nullptr)
 	{}
 
 	bool acceptor::connect()
@@ -30,8 +30,6 @@ namespace proxy
 		try
 		{
 			session_ = make_bridge(io_service_);
-
-			assert(session_ != nullptr);
 
 			acceptor_.async_accept(
 									session_->down_socket_,

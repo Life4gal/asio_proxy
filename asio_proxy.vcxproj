@@ -158,11 +158,13 @@
     <ClCompile Include="acceptor.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="bridge.cpp" />
+    <ClCompile Include="validator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="acceptor.hpp" />
     <ClInclude Include="bridge.hpp" />
     <ClInclude Include="def.hpp" />
+    <ClInclude Include="validator.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

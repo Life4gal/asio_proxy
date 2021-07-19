@@ -19,7 +19,7 @@ namespace proxy
 		up_data_(),
 		down_data_() { }
 
-	void bridge::run(const host_type& forward_host, port_type forward_port)
+	void bridge::run(const host_type& forward_host, const port_type forward_port)
 	{
 		up_socket_.async_connect(
 								ip::tcp::endpoint(ip::make_address(forward_host), forward_port),
@@ -86,7 +86,7 @@ namespace proxy
 		}
 	}
 
-	void bridge::handle_up_read(const boost::system::error_code& error, size_type bytes_transferred)
+	void bridge::handle_up_read(const boost::system::error_code& error, const size_type bytes_transferred)
 	{
 		if (!error)
 		{

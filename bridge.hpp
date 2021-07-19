@@ -2,12 +2,11 @@
 
 #include "def.hpp"
 #include <memory>
+#include "validator.hpp"
 
 namespace proxy
 {
-	class acceptor;
-
-	class bridge : std::enable_shared_from_this<bridge>
+	class bridge : public std::enable_shared_from_this<bridge>
 	{
 	public:
 		friend class acceptor;
@@ -38,5 +37,7 @@ namespace proxy
 		stream_type<max_data_length> down_data_;
 
 		std::mutex mutex_;
+
+		validator validator;
 	};
 }

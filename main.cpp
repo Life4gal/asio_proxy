@@ -1,4 +1,6 @@
-﻿#include "def.hpp"
+﻿#include "sdkddkver.h"
+
+#include "def.hpp"
 #include "acceptor.hpp"
 #include <iostream>
 
