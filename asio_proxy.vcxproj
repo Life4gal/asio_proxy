@@ -156,6 +156,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="acceptor.cpp" />
+    <ClCompile Include="commom\io_context_pool.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="bridge.cpp" />
     <ClCompile Include="validator.cpp" />
@@ -163,8 +164,14 @@
   <ItemGroup>
     <ClInclude Include="acceptor.hpp" />
     <ClInclude Include="bridge.hpp" />
+    <ClInclude Include="commom\address.hpp" />
     <ClInclude Include="def.hpp" />
+    <ClInclude Include="commom\io_context_pool.hpp" />
     <ClInclude Include="validator.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".gitattributes" />
+    <None Include=".gitignore" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

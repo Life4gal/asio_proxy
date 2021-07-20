@@ -23,6 +23,9 @@
     <ClCompile Include="validator.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="commom\io_context_pool.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="def.hpp">
@@ -37,5 +40,15 @@
     <ClInclude Include="validator.hpp">
       <Filter>inc</Filter>
     </ClInclude>
+    <ClInclude Include="commom\address.hpp">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="commom\io_context_pool.hpp">
+      <Filter>inc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".gitattributes" />
+    <None Include=".gitignore" />
   </ItemGroup>
 </Project>
