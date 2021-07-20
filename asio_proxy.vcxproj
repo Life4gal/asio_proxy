@@ -157,6 +157,7 @@
   <ItemGroup>
     <ClCompile Include="acceptor.cpp" />
     <ClCompile Include="commom\io_context_pool.cpp" />
+    <ClCompile Include="logger\logger.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="bridge.cpp" />
     <ClCompile Include="utils\config_loader.cpp" />
@@ -168,6 +169,10 @@
     <ClInclude Include="commom\address.hpp" />
     <ClInclude Include="def.hpp" />
     <ClInclude Include="commom\io_context_pool.hpp" />
+    <ClInclude Include="logger\logger.hpp" />
+    <ClInclude Include="logger\logger_proxy.hpp" />
+    <ClInclude Include="logger\format.hpp" />
+    <ClInclude Include="logger\utils.hpp" />
     <ClInclude Include="utils\task_timer.hpp" />
     <ClInclude Include="utils\config_loader.hpp" />
     <ClInclude Include="utils\singleton.hpp" />
