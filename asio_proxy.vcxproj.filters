@@ -29,9 +29,6 @@
     <ClCompile Include="utils\config_loader.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="logger\logger.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="def.hpp">
@@ -61,13 +58,7 @@
     <ClInclude Include="utils\config_loader.hpp">
       <Filter>inc</Filter>
     </ClInclude>
-    <ClInclude Include="utils\singleton.hpp">
-      <Filter>inc</Filter>
-    </ClInclude>
     <ClInclude Include="utils\task_timer.hpp">
-      <Filter>inc</Filter>
-    </ClInclude>
-    <ClInclude Include="logger\format.hpp">
       <Filter>inc</Filter>
     </ClInclude>
     <ClInclude Include="logger\utils.hpp">

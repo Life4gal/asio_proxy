@@ -3,7 +3,6 @@
 #include <string>
 #include <atomic>
 #include <mutex>
-#include <string_view>
 #include <fstream>
 #include "utils.hpp"
 #include <stdexcept>
@@ -12,7 +11,7 @@ namespace proxy::logger
 {
 	enum class log_level;
 
-	inline std::string log_level_to_string(const log_level level);
+	inline std::string log_level_to_string(log_level level);
 
 	template <log_level Level, std::size_t MaxFileSize>
 	class logger_proxy
@@ -26,9 +25,24 @@ namespace proxy::logger
 		inline static std::string log_suffix = ".txt";
 
 		explicit logger_proxy(const std::string_view output_dir)
-			: directory_name_(std::string{output_dir} + '.' + get_current_exe_name() + '.' +
-							log_level_to_string(this_log_level)),
-			current_file_size_(0) {}
+			: directory_path_(output_dir),
+			current_file_size_(0)
+		{
+			directory_path_.append(log_level_to_string(this_log_level));
+		}
+
+		~logger_proxy()
+		{
+			if (file_handle_.is_open())
+			{
+				file_handle_.close();
+			}
+		}
+
+		logger_proxy(const logger_proxy&)            = delete;
+		logger_proxy& operator=(const logger_proxy&) = delete;
+		logger_proxy(logger_proxy&&)                 = default;
+		logger_proxy& operator=(logger_proxy&&)      = default;
 
 		void write(const std::string_view context)
 		{
@@ -36,9 +50,11 @@ namespace proxy::logger
 							flag_,
 							[&]() -> void
 							{
-								if (create_dir(directory_name_))
+								if (!create_dir(directory_path_))
 								{
-									throw std::runtime_error("cannot create a new directory: " + directory_name_);
+									throw std::runtime_error(
+															"cannot create a new directory: " +
+															directory_path_.string());
 								}
 							});
 
@@ -67,25 +83,20 @@ namespace proxy::logger
 	private:
 		void create_file()
 		{
-			const auto time      = get_current_time_ms();
-			const auto file_name = std::filesystem::path{directory_name_}.append(time);
+			const auto time     = get_current_time_ms().append(log_suffix);
+			auto       new_path = directory_path_;
+			const auto filename = new_path.append(time).generic_string();
 
-			file_handle_.open(file_name, std::ios::out);
+			file_handle_.open(filename, std::ios::out);
 
 			if (file_handle_.is_open())
 			{
 				current_file_size_ = 0;
-				create_link(time);
 			}
 			else
 			{
-				throw std::runtime_error("cannot create a new file: " + file_name.string());
+				throw std::runtime_error("cannot create a new file: " + filename);
 			}
-		}
-
-		void create_link(std::string_view time)
-		{
-			// todo
 		}
 
 		void write_file(const std::string_view context)
@@ -104,7 +115,7 @@ namespace proxy::logger
 			return file_handle_.is_open();
 		}
 
-		std::string directory_name_;
+		std::filesystem::path directory_path_;
 
 		std::atomic<size_type> current_file_size_;
 

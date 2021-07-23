@@ -4,6 +4,8 @@
 #include <charconv>
 #include <vector>
 #include <string>
+#include <type_traits>
+#include <format>
 
 namespace proxy::utils
 {
@@ -31,6 +33,8 @@ namespace proxy::utils
 		constexpr char get_text_char_result(std::string_view text);
 
 		template <typename T>
+			requires std::is_integral_v<T> and (not std::is_same_v<T, bool>) and (not std::is_same_v<T, char>) or
+			std::is_floating_point_v<T>
 		constexpr T get_text_integer_or_floating_point_result(std::string_view text);
 
 		template <typename T>
@@ -125,7 +129,7 @@ namespace proxy::utils
 									});
 			}
 
-			throw parser_exception{std::string{"Cannot parse `"}.append(text) + "` to boolean!"};
+			throw parser_exception{std::format("Cannot parse `{}` to boolean!", text)};
 		}
 
 		constexpr char get_text_char_result(const std::string_view text)
@@ -135,10 +139,12 @@ namespace proxy::utils
 				return text[0];
 			}
 
-			throw parser_exception{std::string{"Cannot parse `"}.append(text) + "` to char!"};
+			throw parser_exception{std::format("Cannot parse `{}` to char!", text)};
 		}
 
 		template <typename T>
+			requires std::is_integral_v<T> and (not std::is_same_v<T, bool>) and (not std::is_same_v<T, char>) or
+			std::is_floating_point_v<T>
 		constexpr T get_text_integer_or_floating_point_result(const std::string_view text)
 		{
 			if (not text.empty())
@@ -189,7 +195,7 @@ namespace proxy::utils
 							: ret;
 			}
 
-			throw parser_exception{std::string{"Cannot parse `"}.append(text) + "` to integer or floating point!"};
+			throw parser_exception{std::format("Cannot parse `{}` to integer or floating point!", text)};
 		}
 
 		template <typename T>

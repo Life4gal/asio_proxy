@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <format>
 
 namespace proxy
 {
@@ -11,7 +12,7 @@ namespace proxy
 
 		[[nodiscard]] std::string to_string() const
 		{
-			return ip + ':' + std::to_string(port);
+			return std::format("{}:{}", ip, port);
 		}
 
 		host_type ip;

@@ -30,7 +30,7 @@ namespace proxy::utils
 		}
 	}
 
-	inline std::string bin_to_hex(std::string_view bin, std::string_view separator = "-")
+	inline std::string bin_to_hex(std::string_view bin, const std::string_view separator = "-")
 	{
 		constexpr auto int_to_char = [](const int v) constexpr -> char
 		{
