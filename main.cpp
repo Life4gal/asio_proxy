@@ -3,7 +3,7 @@
 #include "def.hpp"
 #include "acceptor.hpp"
 #include <iostream>
-
+/*
 int main(const int argc, const char* argv[])
 {
 	if (argc != 5)
@@ -41,4 +41,10 @@ int main(const int argc, const char* argv[])
 	}
 
 	return 0;
+}
+*/
+
+int main()
+{
+	std::cout << "hello";
 }

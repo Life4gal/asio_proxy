@@ -89,7 +89,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\local\boost_1_74_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\local\nlohmann;C:\local\boost_1_74_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -107,7 +107,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\local\boost_1_74_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\local\nlohmann;C:\local\boost_1_74_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -125,7 +125,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\local\boost_1_74_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\local\nlohmann;C:\local\boost_1_74_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -143,7 +143,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\local\boost_1_74_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\local\nlohmann;C:\local\boost_1_74_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -156,24 +156,36 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="acceptor.cpp" />
-    <ClCompile Include="commom\io_context_pool.cpp" />
+    <ClCompile Include="common\address.cpp" />
+    <ClCompile Include="common\io_context_pool.cpp" />
+    <ClCompile Include="config\config_loader.cpp" />
+    <ClCompile Include="launcher\launcher.cpp" />
+    <ClCompile Include="tcp\tcp_session.cpp" />
+    <ClCompile Include="utils\flow_statistics.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="bridge.cpp" />
-    <ClCompile Include="utils\config_loader.cpp" />
+    <ClCompile Include="utils\udp_flow_statistics.cpp" />
+    <ClCompile Include="utils\tcp_flow_statistics.cpp" />
     <ClCompile Include="validator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="acceptor.hpp" />
     <ClInclude Include="bridge.hpp" />
-    <ClInclude Include="commom\address.hpp" />
+    <ClInclude Include="common\address.hpp" />
+    <ClInclude Include="config\config_loader.hpp" />
     <ClInclude Include="def.hpp" />
-    <ClInclude Include="commom\io_context_pool.hpp" />
+    <ClInclude Include="common\io_context_pool.hpp" />
+    <ClInclude Include="launcher\launcher.hpp" />
+    <ClInclude Include="tcp\tcp_socket.hpp" />
+    <ClInclude Include="tcp\tcp_session.hpp" />
+    <ClInclude Include="utils\flow_statistics.hpp" />
     <ClInclude Include="logger\logger.hpp" />
     <ClInclude Include="logger\logger_proxy.hpp" />
     <ClInclude Include="logger\utils.hpp" />
+    <ClInclude Include="utils\udp_flow_statistics.hpp" />
     <ClInclude Include="utils\task_timer.hpp" />
-    <ClInclude Include="utils\config_loader.hpp" />
     <ClInclude Include="utils\string_parse.hpp" />
+    <ClInclude Include="utils\tcp_flow_statistics.hpp" />
     <ClInclude Include="utils\utils.hpp" />
     <ClInclude Include="validator.hpp" />
   </ItemGroup>

@@ -23,10 +23,28 @@
     <ClCompile Include="validator.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="commom\io_context_pool.cpp">
+    <ClCompile Include="common\io_context_pool.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="utils\config_loader.cpp">
+    <ClCompile Include="utils\tcp_flow_statistics.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\udp_flow_statistics.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\flow_statistics.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="launcher\launcher.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="common\address.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="config\config_loader.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tcp\tcp_session.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -43,19 +61,16 @@
     <ClInclude Include="validator.hpp">
       <Filter>inc</Filter>
     </ClInclude>
-    <ClInclude Include="commom\address.hpp">
+    <ClInclude Include="common\address.hpp">
       <Filter>inc</Filter>
     </ClInclude>
-    <ClInclude Include="commom\io_context_pool.hpp">
+    <ClInclude Include="common\io_context_pool.hpp">
       <Filter>inc</Filter>
     </ClInclude>
     <ClInclude Include="utils\utils.hpp">
       <Filter>inc</Filter>
     </ClInclude>
     <ClInclude Include="utils\string_parse.hpp">
-      <Filter>inc</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\config_loader.hpp">
       <Filter>inc</Filter>
     </ClInclude>
     <ClInclude Include="utils\task_timer.hpp">
@@ -68,6 +83,27 @@
       <Filter>inc</Filter>
     </ClInclude>
     <ClInclude Include="logger\logger.hpp">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\tcp_flow_statistics.hpp">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\udp_flow_statistics.hpp">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\flow_statistics.hpp">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="launcher\launcher.hpp">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="config\config_loader.hpp">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="tcp\tcp_socket.hpp">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="tcp\tcp_session.hpp">
       <Filter>inc</Filter>
     </ClInclude>
   </ItemGroup>

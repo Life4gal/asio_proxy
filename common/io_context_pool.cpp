@@ -1,7 +1,7 @@
 #include "io_context_pool.hpp"
 #include <thread>
 
-namespace proxy
+namespace proxy::common
 {
 	io_context_pool::io_context_pool(const size_type init_size)
 		: next_valid_context_(0)

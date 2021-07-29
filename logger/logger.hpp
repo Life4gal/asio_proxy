@@ -47,6 +47,27 @@ namespace proxy
 		constexpr static size_type warning_max_file_size = 1024 * 1024 * 5;  // 5 M
 		constexpr static size_type error_max_file_size   = 1024 * 1024 * 1;  // 1 M
 
+		template <const logger::log_level Level>
+		void set_log_directory(const std::string_view output_dir)
+		{
+			if constexpr (Level == logger::log_level::info)
+			{
+				info_.set_log_directory(output_dir);
+			}
+			else if constexpr (Level == logger::log_level::warning)
+			{
+				warning_.set_log_directory(output_dir);
+			}
+			else if constexpr (Level == logger::log_level::error)
+			{
+				error_.set_log_directory(output_dir);
+			}
+			else
+			{
+				throw std::invalid_argument{"invalid log level"};
+			}
+		}
+
 		void set_log_level(const logger::log_level level)
 		{
 			level_ = level;
@@ -82,15 +103,13 @@ namespace proxy
 		}
 
 	private:
-		logger_manager() = default;
-
-		constexpr bool check_level(logger::log_level level) const
+		[[nodiscard]] constexpr bool check_level(logger::log_level level) const
 		{
 			using underlying_type = std::underlying_type_t<logger::log_level>;
 			return static_cast<underlying_type>(level) >= static_cast<underlying_type>(level_);
 		}
 
-		logger::log_level level_ = logger::log_level::info;
+		logger::log_level level_{logger::log_level::info};
 
 		logger::logger_proxy<logger::log_level::info, info_max_file_size>       info_{"log"};
 		logger::logger_proxy<logger::log_level::warning, warning_max_file_size> warning_{"log"};

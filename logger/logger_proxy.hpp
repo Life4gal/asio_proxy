@@ -24,11 +24,13 @@ namespace proxy::logger
 
 		inline static std::string log_suffix = ".txt";
 
+		logger_proxy()
+			: current_file_size_(0) {}
+
 		explicit logger_proxy(const std::string_view output_dir)
-			: directory_path_(output_dir),
-			current_file_size_(0)
+			: current_file_size_(0)
 		{
-			directory_path_.append(log_level_to_string(this_log_level));
+			set_log_directory(output_dir);
 		}
 
 		~logger_proxy()
@@ -39,10 +41,16 @@ namespace proxy::logger
 			}
 		}
 
-		logger_proxy(const logger_proxy&)            = delete;
-		logger_proxy& operator=(const logger_proxy&) = delete;
-		logger_proxy(logger_proxy&&)                 = default;
-		logger_proxy& operator=(logger_proxy&&)      = default;
+		logger_proxy(const logger_proxy&)                = delete;
+		logger_proxy& operator=(const logger_proxy&)     = delete;
+		logger_proxy(logger_proxy&&) noexcept            = default;
+		logger_proxy& operator=(logger_proxy&&) noexcept = default;
+
+		void set_log_directory(const std::string_view output_dir)
+		{
+			directory_path_ = output_dir;
+			directory_path_.append(log_level_to_string(this_log_level));
+		}
 
 		void write(const std::string_view context)
 		{

@@ -7,7 +7,7 @@
 #include <list>
 #include <memory>
 
-namespace proxy
+namespace proxy::common
 {
 	class io_context_pool : boost::noncopyable
 	{
