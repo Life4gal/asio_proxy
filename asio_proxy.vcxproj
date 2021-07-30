@@ -162,6 +162,8 @@
     <ClCompile Include="launcher\launcher.cpp" />
     <ClCompile Include="tcp\tcp_session.cpp" />
     <ClCompile Include="tcp\tcp_session_manager.cpp" />
+    <ClCompile Include="udp\udp_session.cpp" />
+    <ClCompile Include="udp\udp_session_manager.cpp" />
     <ClCompile Include="utils\flow_statistics.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="bridge.cpp" />
@@ -180,6 +182,9 @@
     <ClInclude Include="tcp\tcp_socket.hpp" />
     <ClInclude Include="tcp\tcp_session.hpp" />
     <ClInclude Include="tcp\tcp_session_manager.hpp" />
+    <ClInclude Include="udp\udp_socket.hpp" />
+    <ClInclude Include="udp\udp_session.hpp" />
+    <ClInclude Include="udp\udp_session_manager.hpp" />
     <ClInclude Include="utils\flow_statistics.hpp" />
     <ClInclude Include="logger\logger.hpp" />
     <ClInclude Include="logger\logger_proxy.hpp" />

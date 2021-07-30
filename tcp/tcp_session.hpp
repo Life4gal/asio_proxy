@@ -4,16 +4,16 @@
 #include <vector>
 #include <boost/asio/deadline_timer.hpp>
 #include "tcp_socket.hpp"
-#include "../common/address.hpp"
 
 namespace proxy::tcp
 {
 	class tcp_session : public std::enable_shared_from_this<tcp_session>
 	{
 	public:
-		using io_context_type = tcp_socket::io_context_type;
-		using size_type = tcp_socket::size_type;
 		using socket_type = tcp_socket;
+
+		using io_context_type = socket_type::io_context_type;
+		using size_type = socket_type::size_type;
 		using socket_stream_type = std::vector<socket_type>;
 		using timer_type = boost::asio::deadline_timer;
 
@@ -28,10 +28,10 @@ namespace proxy::tcp
 
 		socket_type& get_client_socket();
 
-		void start(const common::address_set& target_addresses);
+		void start(const common::forward_addresses& target_addresses);
 
 	private:
-		void init_target_socket(const common::address_set& target_addresses);
+		void init_target_socket(const common::forward_addresses& target_addresses);
 
 		bool connect_target_server();
 

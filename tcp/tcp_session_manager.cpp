@@ -7,7 +7,7 @@ namespace proxy::tcp
 {
 	tcp_session_manager::tcp_session_manager(
 		const common::address::port_type listen_port,
-		common::address_set              target_addresses,
+		common::forward_addresses        target_addresses,
 		const size_type                  pool_size)
 		: io_context_pool_(pool_size),
 		target_addresses_(std::move(target_addresses)),

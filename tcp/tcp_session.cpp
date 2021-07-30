@@ -19,7 +19,7 @@ namespace proxy::tcp
 		return client_socket_;
 	}
 
-	void tcp_session::start(const common::address_set& target_addresses)
+	void tcp_session::start(const common::forward_addresses& target_addresses)
 	{
 		log_info(std::format("client connection received: {}", client_socket_.get_session_id()));
 
@@ -34,18 +34,18 @@ namespace proxy::tcp
 		}
 	}
 
-	void tcp_session::init_target_socket(const common::address_set& target_addresses)
+	void tcp_session::init_target_socket(const common::forward_addresses& target_addresses)
 	{
-		const auto& tcp = target_addresses.tcp;
-		for (decltype(tcp.size()) i = 0; i < tcp.size(); ++i)
+		for (decltype(target_addresses.size()) i = 0; i < target_addresses.size(); ++i)
 		{
-			target_socket_stream_.emplace_back(io_context_, i, tcp[i]);
+			target_socket_stream_.emplace_back(io_context_, i, target_addresses[i]);
 		}
 	}
 
 	bool tcp_session::connect_target_server()
 	{
 		using namespace boost::asio;
+
 		for (auto& target : target_socket_stream_)
 		{
 			try
@@ -223,7 +223,7 @@ namespace proxy::tcp
 		{
 			log_warning(
 						std::format(
-									"unable to write client message -> client: {} target: {}[{}] -> error: {} -> size: {} -> data: {}",
+									"unable to write client message -> client: {} -> target: {}[{}] -> error: {} -> size: {} -> data: {}",
 									client_socket_.get_session_id(),
 									target.serial_,
 									target.get_session_id(),

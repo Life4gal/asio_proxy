@@ -14,7 +14,7 @@ namespace proxy::tcp
 
 		tcp_session_manager(
 			common::address::port_type listen_port,
-			common::address_set        target_addresses,
+			common::forward_addresses  target_addresses,
 			size_type                  pool_size
 			);
 
@@ -23,8 +23,8 @@ namespace proxy::tcp
 	private:
 		void start_acceptor();
 
-		common::io_context_pool io_context_pool_;
-		common::address_set     target_addresses_;
+		common::io_context_pool   io_context_pool_;
+		common::forward_addresses target_addresses_;
 
 		acceptor_type acceptor_;
 	};
