@@ -47,6 +47,9 @@
     <ClCompile Include="tcp\tcp_session.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="tcp\tcp_session_manager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="def.hpp">
@@ -104,6 +107,9 @@
       <Filter>inc</Filter>
     </ClInclude>
     <ClInclude Include="tcp\tcp_session.hpp">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="tcp\tcp_session_manager.hpp">
       <Filter>inc</Filter>
     </ClInclude>
   </ItemGroup>

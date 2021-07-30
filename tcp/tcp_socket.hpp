@@ -3,6 +3,7 @@
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <utility>
+#include <array>
 #include "../common/address.hpp"
 
 namespace proxy::tcp

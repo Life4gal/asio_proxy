@@ -9,7 +9,11 @@ namespace proxy
 	class tcp_flow_statistics final : public statistics::flow_statistics
 	{
 	public:
-		tcp_flow_statistics();
+		static tcp_flow_statistics& instance()
+		{
+			static tcp_flow_statistics tcp_flow_statistics_;
+			return tcp_flow_statistics_;
+		}
 
 		void add_connection();
 
@@ -18,6 +22,8 @@ namespace proxy
 		void add_packet(const std::string& context);
 
 	private:
+		tcp_flow_statistics();
+
 		std::atomic<int>                       count_;
 		task_timer<boost::posix_time::seconds> timer_;
 

@@ -161,6 +161,7 @@
     <ClCompile Include="config\config_loader.cpp" />
     <ClCompile Include="launcher\launcher.cpp" />
     <ClCompile Include="tcp\tcp_session.cpp" />
+    <ClCompile Include="tcp\tcp_session_manager.cpp" />
     <ClCompile Include="utils\flow_statistics.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="bridge.cpp" />
@@ -178,6 +179,7 @@
     <ClInclude Include="launcher\launcher.hpp" />
     <ClInclude Include="tcp\tcp_socket.hpp" />
     <ClInclude Include="tcp\tcp_session.hpp" />
+    <ClInclude Include="tcp\tcp_session_manager.hpp" />
     <ClInclude Include="utils\flow_statistics.hpp" />
     <ClInclude Include="logger\logger.hpp" />
     <ClInclude Include="logger\logger_proxy.hpp" />

@@ -23,7 +23,6 @@ namespace proxy::common
 	};
 
 	using forward_addresses = std::vector<address>;
-	using local_listen_ports = std::vector<address::port_type>;
 
 	struct address_set
 	{
