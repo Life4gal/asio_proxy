@@ -1,32 +1,40 @@
 #include "launcher.hpp"
 
-#include "../utils/config_loader.hpp"
+#include "../config/config_loader.hpp"
+#include "../tcp/tcp_session_manager.hpp"
+#include "../udp/udp_session_manager.hpp"
+#include "../logger/logger.hpp"
 
 namespace proxy
 {
-	void launcher::start() { }
-
-
-	std::vector<common::address> launcher::read_forward_address()
+	void launcher::start(const std::string_view local_config_path, const std::string_view remote_config_path)
 	{
-		std::vector<common::address> forward_address;
+		const auto& [io_context_pool_size, local_listen_address, log_level, local_ready] =
+			config::load_local_config(local_config_path);
 
-		for (auto&      config = utils::config::instance();
-			const auto& [ip, port] : config.get_config())
+		const auto& [type, forward_addresses, remote_ready] =
+			config::load_remote_config(remote_config_path);
+
+		if (!local_ready || !remote_ready)
 		{
-			auto real_ip = common::address::make_ip(ip);
-			if (real_ip.empty())
-			{
-				continue;
-			}
-
-
-			common::address::port_type real_port{};
-			utils::parse(port, real_port);
-
-			forward_address.emplace_back(real_ip, real_port);
+			throw std::runtime_error{"config error"};
 		}
 
-		return forward_address;
+		logger_manager::instance().set_log_level(log_level);
+
+		if (type == "tcp")
+		{
+			tcp::tcp_session_manager manager(local_listen_address,
+											forward_addresses,
+											io_context_pool_size);
+			manager.run();
+		}
+		else if (type == "udp")
+		{
+			udp::udp_session_manager manager(local_listen_address,
+											forward_addresses,
+											io_context_pool_size);
+			manager.run();
+		}
 	}
 }

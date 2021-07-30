@@ -12,7 +12,7 @@ namespace proxy::udp
 	{
 	public:
 		using socket_type = udp_socket;
-
+		using address_type = socket_type::address_type;
 		using io_context_type = socket_type::io_context_type;
 		using size_type = socket_type::size_type;
 		using buffer_type = socket_type::buffer_type;
@@ -26,10 +26,10 @@ namespace proxy::udp
 		constexpr static duration_type heartbeat_interval = 8 * 60;
 
 		explicit udp_session(
-			io_context_type&           io_context,
-			common::address::port_type listen_port,
-			common::forward_addresses  target_addresses,
-			udp_session_manager&       manager);
+			io_context_type&          io_context,
+			const address_type&       listen_address,
+			common::forward_addresses target_addresses,
+			udp_session_manager&      manager);
 
 		void send_to_target(const buffer_type& buffer, size_type size);
 
@@ -42,8 +42,7 @@ namespace proxy::udp
 		io_context_type& io_context_;
 		timer_type       heartbeat_timer_;
 
-		socket_type                target_socket_;
-		common::address::port_type listen_port_;
+		socket_type target_socket_;
 
 		udp_session_manager&      manager_;
 		common::forward_addresses target_addresses_;

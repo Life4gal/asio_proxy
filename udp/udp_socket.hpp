@@ -18,35 +18,35 @@ namespace proxy::udp
 		constexpr static size_type buffer_size = 4 * 1024;
 		using buffer_type = stream_type<buffer_size>;
 
+		using address_type = common::address;
+
 		udp_socket(
-			io_context_type&                 io_context,
-			const common::address::port_type listen_port
+			io_context_type&    io_context,
+			const address_type& listen_address
 			)
 			: socket_(
 					io_context,
-					boost::asio::ip::udp::endpoint(
-													boost::asio::ip::make_address("127.0.0.1"),
-													listen_port
-												)
+					make_endpoint(listen_address)
 					),
 			buffer_() {}
 
-		[[nodiscard]] std::string get_remote_address() const
+		[[nodiscard]] common::address get_remote_address() const
 		{
-			return std::format("{}:{}",
-								remote_.address().to_string(),
-								remote_.port());
+			return make_address(remote_);
 		}
 
-		[[nodiscard]] std::string get_local_address() const
+		[[nodiscard]] std::string get_remote_address_string() const
+		{
+			return get_remote_address().to_string();
+		}
+
+		[[nodiscard]] common::address get_local_address() const
 		{
 			if (socket_.is_open())
 			{
 				try
 				{
-					return std::format("{}:{}",
-										socket_.local_endpoint().address().to_string(),
-										socket_.local_endpoint().port());
+					return make_address(socket_.local_endpoint());
 				}
 				catch (const std::exception&) {}
 			}
@@ -54,8 +54,29 @@ namespace proxy::udp
 			return {};
 		}
 
+		[[nodiscard]] std::string get_local_address_string() const
+		{
+			return get_local_address().to_string();
+		}
+
 		socket_type   socket_;
 		endpoint_type remote_;
 		buffer_type   buffer_;
+
+		static endpoint_type make_endpoint(const address_type& address)
+		{
+			return boost::asio::ip::udp::endpoint(
+												boost::asio::ip::make_address(address.ip),
+												address.port
+												);
+		}
+
+		static address_type make_address(const endpoint_type& endpoint)
+		{
+			return {
+				.ip = endpoint.address().to_string(),
+				.port = endpoint.port()
+			};
+		}
 	};
 }

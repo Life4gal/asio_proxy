@@ -9,14 +9,13 @@
 namespace proxy::udp
 {
 	udp_session::udp_session(
-		io_context_type&                 io_context,
-		const common::address::port_type listen_port,
-		common::forward_addresses        target_addresses,
-		udp_session_manager&             manager)
+		io_context_type&          io_context,
+		const address_type&       listen_address,
+		common::forward_addresses target_addresses,
+		udp_session_manager&      manager)
 		: io_context_(io_context),
 		heartbeat_timer_(io_context),
-		target_socket_(io_context, listen_port),
-		listen_port_(listen_port),
+		target_socket_(io_context, listen_address),
 		manager_(manager),
 		target_addresses_(std::move(target_addresses)),
 		closed_(false) { }
@@ -36,18 +35,13 @@ namespace proxy::udp
 			{
 				auto written = target_socket_.socket_.send_to(
 															boost::asio::buffer(buffer),
-															boost::asio::ip::udp::endpoint(
-																							boost::asio::ip::make_address(target
-																														.
-																														ip),
-																							target.port
-																						)
+															socket_type::make_endpoint(target)
 															);
 
 				log_info(
 						std::format(
-									"client port: {} -> target: {} -> size: {} -> data: {}",
-									listen_port_,
+									"client: {} -> target: {} -> size: {} -> data: {}",
+									target_socket_.get_local_address_string(),
 									target.to_string(),
 									written,
 									utils::bin_to_hex(reinterpret_cast<const char*>(buffer.data()))
@@ -60,8 +54,8 @@ namespace proxy::udp
 			{
 				log_info(
 						std::format(
-									"client port: {} -> target: {} -> size: {} -> data: {} -> failed: {}",
-									listen_port_,
+									"client: {} -> target: {} -> size: {} -> data: {} -> failed: {}",
+									target_socket_.get_local_address_string(),
 									target.to_string(),
 									size,
 									utils::bin_to_hex(reinterpret_cast<const char*>(buffer.data())),
@@ -96,9 +90,9 @@ namespace proxy::udp
 													{
 														log_info(
 																std::format(
-																			"client port: {} -> target: {} -> size: {} -> data: {}",
-																			listen_port_,
-																			target_socket_.get_remote_address(),
+																			"client: {} -> target: {} -> size: {} -> data: {}",
+																			target_socket_.get_local_address_string(),
+																			target_socket_.get_remote_address_string(),
 																			size,
 																			utils::bin_to_hex(reinterpret_cast<const
 																								char*>(target_socket_.
@@ -109,18 +103,20 @@ namespace proxy::udp
 														udp_flow_statistics::instance().
 															add_packet(std::format("receive_from_target_{}",
 																					target_socket_.
-																					get_remote_address()));
+																					get_remote_address_string()));
 
-														manager_.send_to_client(target_socket_, size, listen_port_);
+														manager_.send_to_client(target_socket_, size);
 														async_receive_target();
 													}
 													else if (error_code != boost::asio::error::operation_aborted)
 													{
 														log_warning(
 																	std::format(
-																				"unable to receive client message -> client port: {} -> target: {} -> error: {}",
-																				listen_port_,
-																				target_socket_.get_remote_address(),
+																				"unable to receive client message -> client: {} -> target: {} -> error: {}",
+																				target_socket_.
+																				get_local_address_string(),
+																				target_socket_.
+																				get_remote_address_string(),
 																				error_code.message()
 																				)
 																	);
@@ -143,9 +139,9 @@ namespace proxy::udp
 											{
 												log_warning(
 															std::format(
-																		"{} seconds did not receive any information, close the udp connection -> client port: {}",
+																		"{} seconds did not receive any information, close the udp connection -> client: {}",
 																		heartbeat_interval,
-																		listen_port_));
+																		target_socket_.get_local_address_string()));
 												close();
 											}
 										});
@@ -176,7 +172,7 @@ namespace proxy::udp
 				target_socket_.socket_.close(dummy);
 			}
 
-			manager_.close_session(listen_port_);
+			manager_.close_session(target_socket_.get_local_address());
 		}
 	}
 }

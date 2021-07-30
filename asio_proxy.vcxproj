@@ -155,7 +155,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="acceptor.cpp" />
     <ClCompile Include="common\address.cpp" />
     <ClCompile Include="common\io_context_pool.cpp" />
     <ClCompile Include="config\config_loader.cpp" />
@@ -166,19 +165,15 @@
     <ClCompile Include="udp\udp_session_manager.cpp" />
     <ClCompile Include="utils\flow_statistics.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="bridge.cpp" />
     <ClCompile Include="utils\udp_flow_statistics.cpp" />
     <ClCompile Include="utils\tcp_flow_statistics.cpp" />
-    <ClCompile Include="validator.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="acceptor.hpp" />
-    <ClInclude Include="bridge.hpp" />
     <ClInclude Include="common\address.hpp" />
     <ClInclude Include="config\config_loader.hpp" />
-    <ClInclude Include="def.hpp" />
     <ClInclude Include="common\io_context_pool.hpp" />
     <ClInclude Include="launcher\launcher.hpp" />
+    <ClInclude Include="logger\log_forward.hpp" />
     <ClInclude Include="tcp\tcp_socket.hpp" />
     <ClInclude Include="tcp\tcp_session.hpp" />
     <ClInclude Include="tcp\tcp_session_manager.hpp" />
@@ -194,7 +189,6 @@
     <ClInclude Include="utils\string_parse.hpp" />
     <ClInclude Include="utils\tcp_flow_statistics.hpp" />
     <ClInclude Include="utils\utils.hpp" />
-    <ClInclude Include="validator.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitattributes" />

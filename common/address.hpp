@@ -18,20 +18,12 @@ namespace proxy::common
 
 		static host_type make_ip(std::string_view ip);
 
-		host_type ip;
-		port_type port;
+		host_type ip{};
+		port_type port{};
 	};
 
 	using forward_addresses = std::vector<address>;
 
-	struct address_set
-	{
-		forward_addresses tcp;
-		forward_addresses udp;
-	};
-
 	void from_json(const nlohmann::json& j, address& data);
 	void to_json(nlohmann::json& j, const address& data);
-	void from_json(const nlohmann::json& j, address_set& data);
-	void to_json(nlohmann::json& j, const address_set& data);
 }

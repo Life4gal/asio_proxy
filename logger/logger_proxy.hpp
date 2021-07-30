@@ -7,6 +7,8 @@
 #include "utils.hpp"
 #include <stdexcept>
 
+#include <iostream>
+
 namespace proxy::logger
 {
 	enum class log_level;
@@ -109,7 +111,8 @@ namespace proxy::logger
 
 		void write_file(const std::string_view context)
 		{
-			file_handle_ << context;
+			file_handle_ << context << '\n';
+			std::cout << context << '\n';
 			current_file_size_ += context.length();
 		}
 

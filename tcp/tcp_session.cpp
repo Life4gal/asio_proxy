@@ -21,46 +21,33 @@ namespace proxy::tcp
 
 	void tcp_session::start(const common::forward_addresses& target_addresses)
 	{
-		log_info(std::format("client connection received: {}", client_socket_.get_session_id()));
+		log_info(std::format("client connection received: [{}]", client_socket_.get_session_id()));
 
 		tcp_flow_statistics::instance().add_connection();
 
 		keep_alive();
-		init_target_socket(target_addresses);
-		if (connect_target_server())
+		if (connect_target_server(target_addresses))
 		{
 			async_read_client();
 			async_read_target();
 		}
 	}
 
-	void tcp_session::init_target_socket(const common::forward_addresses& target_addresses)
-	{
-		for (decltype(target_addresses.size()) i = 0; i < target_addresses.size(); ++i)
-		{
-			target_socket_stream_.emplace_back(io_context_, i, target_addresses[i]);
-		}
-	}
-
-	bool tcp_session::connect_target_server()
+	bool tcp_session::connect_target_server(const common::forward_addresses& target_addresses)
 	{
 		using namespace boost::asio;
 
-		for (auto& target : target_socket_stream_)
+		for (const auto& address : target_addresses)
 		{
+			auto& target = target_socket_stream_.emplace_back(io_context_);
+
 			try
 			{
-				target.socket_.connect(
-										ip::tcp::endpoint(
-														ip::make_address(target.remote_.ip),
-														target.remote_.port
-														)
-									);
+				target.connect(address);
 
 				log_info(
 						std::format(
-									"successfully connected to {} -> client: {}, target: {}",
-									target.serial_,
+									"successfully connected to target -> client: [{}] -> target: [{}]",
 									client_socket_.get_session_id(),
 									target.get_session_id()
 									)
@@ -70,8 +57,7 @@ namespace proxy::tcp
 			{
 				log_warning(
 							std::format(
-										"connected to {} -> client: {}, target: {} -> failed: {}",
-										target.serial_,
+										"connected to target -> client: [{}] -> target: [{}] -> failed: [{}]",
 										client_socket_.get_session_id(),
 										target.get_session_id(),
 										e.what()
@@ -89,6 +75,7 @@ namespace proxy::tcp
 	{
 		using namespace boost::asio;
 		using error_code_t = boost::system::error_code;
+
 		client_socket_.socket_.async_read_some(
 												buffer(client_socket_.buffer_),
 												[this](const error_code_t& error_code, const size_type size)
@@ -104,7 +91,7 @@ namespace proxy::tcp
 
 														log_info(
 																std::format(
-																			"client: {} -> size: {} -> data: {}",
+																			"client: [{}] -> size: [{}] -> data: [{}]",
 																			client_socket_.get_session_id(),
 																			size,
 																			utils::bin_to_hex(reinterpret_cast<const
@@ -123,7 +110,7 @@ namespace proxy::tcp
 													{
 														log_warning(
 																	std::format(
-																				"unable to receive client message -> client: {} -> error: {}",
+																				"unable to receive client message -> client: [{}] -> error: [{}]",
 																				client_socket_.get_session_id(),
 																				error_code.message()
 																				)
@@ -159,9 +146,8 @@ namespace proxy::tcp
 											{
 												log_info(
 														std::format(
-																	"client: {} -> target: {}[{}] -> size: {} -> data: {}",
+																	"client: [{}] -> target: [{}] -> size: [{}] -> data: [{}]",
 																	client_socket_.get_session_id(),
-																	target.serial_,
 																	target.get_session_id(),
 																	size,
 																	utils::bin_to_hex(reinterpret_cast<const
@@ -171,7 +157,8 @@ namespace proxy::tcp
 														);
 
 												tcp_flow_statistics::instance().
-													add_packet(std::format("receive_from_target_{}", target.serial_));
+													add_packet(std::format("receive_from_target_{}",
+																			target.get_remote_address_string()));
 
 												send_to_client(target, size);
 												async_read_target(target);
@@ -180,9 +167,8 @@ namespace proxy::tcp
 											{
 												log_warning(
 															std::format(
-																		"unable to receive target message -> client: {} -> target: {}[{}] -> error: {}",
+																		"unable to receive target message -> client: [{}] -> target: [{}] -> error: [{}]",
 																		client_socket_.get_session_id(),
-																		target.serial_,
 																		target.get_session_id(),
 																		error_code.message()
 																		)
@@ -193,7 +179,7 @@ namespace proxy::tcp
 									);
 	}
 
-	void tcp_session::send_to_client(socket_type& target, size_type size)
+	void tcp_session::send_to_client(socket_type& target, const size_type size)
 	{
 		using namespace boost::asio;
 		using error_code_t = boost::system::error_code;
@@ -205,9 +191,8 @@ namespace proxy::tcp
 		{
 			log_info(
 					std::format(
-								"client: {} -> target: {}[{}] -> size: {} -> data: {}",
+								"client: [{}] -> target: [{}] -> size: [{}] -> data: [{}]",
 								client_socket_.get_session_id(),
-								target.serial_,
 								target.get_session_id(),
 								written,
 								utils::bin_to_hex(reinterpret_cast<const
@@ -223,9 +208,8 @@ namespace proxy::tcp
 		{
 			log_warning(
 						std::format(
-									"unable to write client message -> client: {} -> target: {}[{}] -> error: {} -> size: {} -> data: {}",
+									"unable to write client message -> client: [{}] -> target: [{}] -> error: [{}] -> size: [{}] -> data: [{}]",
 									client_socket_.get_session_id(),
-									target.serial_,
 									target.get_session_id(),
 									error_code.message(),
 									size,
@@ -236,7 +220,7 @@ namespace proxy::tcp
 		}
 	}
 
-	void tcp_session::send_to_target(size_type size)
+	void tcp_session::send_to_target(const size_type size)
 	{
 		using namespace boost::asio;
 		using error_code_t = boost::system::error_code;
@@ -250,9 +234,8 @@ namespace proxy::tcp
 			{
 				log_info(
 						std::format(
-									"client: {} -> target: {}[{}] -> size: {} -> data: {}",
+									"client: [{}] -> target: [{}] -> size: [{}] -> data: [{}]",
 									client_socket_.get_session_id(),
-									target.serial_,
 									target.get_session_id(),
 									written,
 									utils::bin_to_hex(reinterpret_cast<const
@@ -262,15 +245,14 @@ namespace proxy::tcp
 						);
 
 				tcp_flow_statistics::instance().
-					add_packet(std::format("send_to_target_{}", target.serial_));
+					add_packet(std::format("send_to_target_{}", target.get_remote_address_string()));
 			}
 			else
 			{
 				log_warning(
 							std::format(
-										"unable to write target message -> client: {} target: {}[{}] -> error: {} -> size: {} -> data: {}",
+										"unable to write target message -> client: [{}] target: [{}] -> error: [{}] -> size: [{}] -> data: [{}]",
 										client_socket_.get_session_id(),
-										target.serial_,
 										target.get_session_id(),
 										error_code.message(),
 										size,
@@ -296,7 +278,7 @@ namespace proxy::tcp
 											{
 												log_warning(
 															std::format(
-																		"{} seconds did not receive any information, close the tcp connection -> client: {}",
+																		"[{}] seconds did not receive any information, close the tcp connection -> client: [{}]",
 																		heartbeat_interval,
 																		self->client_socket_.get_session_id()));
 												self->close();
@@ -307,7 +289,7 @@ namespace proxy::tcp
 		{
 			log_warning(
 						std::format(
-									"heartbeat error: {}",
+									"heartbeat error: [{}]",
 									e.what()
 									)
 						);

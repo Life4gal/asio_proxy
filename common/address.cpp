@@ -40,9 +40,4 @@ namespace proxy::common
 		j["ip"]   = data.ip;
 		j["port"] = data.port;
 	}
-
-	NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
-										address_set,
-										tcp,
-										udp)
 }

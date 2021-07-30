@@ -1,16 +1,12 @@
 #pragma once
 
-#include "../common/address.hpp"
-#include <vector>
+#include <string_view>
 
 namespace proxy
 {
 	class launcher
 	{
 	public:
-		void start();
-
-	private:
-		static std::vector<common::address> read_forward_address();
+		static void start(std::string_view local_config_path, std::string_view remote_config_path);
 	};
 }

@@ -2,38 +2,35 @@
 
 #include "../common/address.hpp"
 #include "../common/io_context_pool.hpp"
+#include "../logger/log_forward.hpp"
 
 namespace proxy::config
 {
 	struct local_config
 	{
 		using io_context_pool_size_type = common::io_context_pool::size_type;
-		using local_listen_ports_type = common::local_listen_ports;
-
 		io_context_pool_size_type io_context_pool_size{};
-		local_listen_ports_type   local_listen_ports{};
+
+		common::address local_listen_address{"127.0.0.1"};
+
+		std::underlying_type_t<logger::log_level> log_level{};
 
 		bool ready = false;
 	};
 
 	struct remote_config
 	{
-		using forward_addresses_type = common::address_set;
+		using forward_addresses_type = common::forward_addresses;
 
+		std::string            type;
 		forward_addresses_type forward_addresses{};
 
 		bool ready = false;
 	};
 
 	void from_json(const nlohmann::json& j, local_config& data);
-	void to_json(nlohmann::json& j, const local_config& data);
 	void from_json(const nlohmann::json& j, remote_config& data);
-	void to_json(nlohmann::json& j, const remote_config& data);
 
-	class config_loader
-	{
-	public:
-		static local_config  load_local_config(std::string_view config_path);
-		static remote_config remote_local_config(std::string_view config_path);
-	};
+	local_config  load_local_config(std::string_view config_path);
+	remote_config load_remote_config(std::string_view config_path);
 }

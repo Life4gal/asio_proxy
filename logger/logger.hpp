@@ -1,37 +1,12 @@
 #pragma once
 
-#include <string>
+#include "log_forward.hpp"
 #include "logger_proxy.hpp"
 #include <source_location>
 #include <string_view>
 
 namespace proxy
 {
-	namespace logger
-	{
-		enum class log_level
-		{
-			info = 0,
-			warning = 1,
-			error = 2
-		};
-
-		inline std::string log_level_to_string(const log_level level)
-		{
-			switch (level)
-			{
-				case log_level::info:
-					return "info";
-				case log_level::warning:
-					return "warning";
-				case log_level::error:
-					return "error";
-				default:
-					return "unknown";
-			}
-		}
-	}
-
 	class logger_manager
 	{
 	public:
@@ -46,6 +21,13 @@ namespace proxy
 		constexpr static size_type info_max_file_size    = 1024 * 1024 * 10; // 10 M
 		constexpr static size_type warning_max_file_size = 1024 * 1024 * 5;  // 5 M
 		constexpr static size_type error_max_file_size   = 1024 * 1024 * 1;  // 1 M
+
+		void set_all_log_directory(const std::string_view output_dir)
+		{
+			info_.set_log_directory(output_dir);
+			warning_.set_log_directory(output_dir);
+			error_.set_log_directory(output_dir);
+		}
 
 		template <const logger::log_level Level>
 		void set_log_directory(const std::string_view output_dir)
@@ -71,6 +53,11 @@ namespace proxy
 		void set_log_level(const logger::log_level level)
 		{
 			level_ = level;
+		}
+
+		void set_log_level(std::underlying_type_t<logger::log_level> level)
+		{
+			level_ = static_cast<logger::log_level>(level);
 		}
 
 		template <const logger::log_level Level>
@@ -106,7 +93,7 @@ namespace proxy
 		[[nodiscard]] constexpr bool check_level(logger::log_level level) const
 		{
 			using underlying_type = std::underlying_type_t<logger::log_level>;
-			return static_cast<underlying_type>(level) >= static_cast<underlying_type>(level_);
+			return static_cast<underlying_type>(level) <= static_cast<underlying_type>(level_);
 		}
 
 		logger::log_level level_{logger::log_level::info};

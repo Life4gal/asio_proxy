@@ -30,16 +30,24 @@ namespace
 
 namespace proxy::config
 {
-	NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
-										local_config,
-										io_context_pool_size,
-										local_listen_ports);
+	void from_json(const nlohmann::json& j, local_config& data)
+	{
+		data.io_context_pool_size = j["io_context_pool_size"];
+		if (const auto it = j.find("listen_ip"); it != j.end())
+		{
+			data.local_listen_address.ip = it.value();
+		}
+		data.local_listen_address.port = j["listen_port"];
+		data.log_level                 = j["log_level"];
+	}
+
 	NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
 										remote_config,
+										type,
 										forward_addresses
 									)
 
-	local_config config_loader::load_local_config(const std::string_view config_path)
+	local_config load_local_config(const std::string_view config_path)
 	{
 		std::ifstream config;
 		if (!do_file_validate(config_path, config))
@@ -55,7 +63,7 @@ namespace proxy::config
 		return ret;
 	}
 
-	remote_config config_loader::remote_local_config(const std::string_view config_path)
+	remote_config load_remote_config(const std::string_view config_path)
 	{
 		std::ifstream config;
 		if (!do_file_validate(config_path, config))

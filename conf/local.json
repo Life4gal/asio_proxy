@@ -1,0 +1,6 @@
+{
+	"io_context_pool_size": 4, 
+	"listen_ip": "0.0.0.0", 
+	"listen_port": 60000, 
+	"log_level": 3
+}

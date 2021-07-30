@@ -13,9 +13,9 @@ namespace proxy::tcp
 		using size_type = common::io_context_pool::size_type;
 
 		tcp_session_manager(
-			common::address::port_type listen_port,
-			common::forward_addresses  target_addresses,
-			size_type                  pool_size
+			const common::address&    listen_address,
+			common::forward_addresses target_addresses,
+			size_type                 pool_size
 			);
 
 		void run();

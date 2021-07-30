@@ -31,9 +31,7 @@ namespace proxy::tcp
 		void start(const common::forward_addresses& target_addresses);
 
 	private:
-		void init_target_socket(const common::forward_addresses& target_addresses);
-
-		bool connect_target_server();
+		bool connect_target_server(const common::forward_addresses& target_addresses);
 
 		void async_read_client();
 		void async_read_target();

@@ -1,50 +1,23 @@
-﻿#include "sdkddkver.h"
-
-#include "def.hpp"
-#include "acceptor.hpp"
+﻿#include "launcher/launcher.hpp"
+#include "logger/logger.hpp"
 #include <iostream>
-/*
-int main(const int argc, const char* argv[])
+
+int main(const int argc, char* argv[])
 {
-	if (argc != 5)
-	{
-		std::cerr << "usage: " << argv[0] << " <local host ip> <local port> <forward host ip> <forward port>" <<
-			std::endl;
-		return -1;
-	}
+	// if (argc != 4 && argc != 3)
+	// {
+	// 	std::cerr << "invalid arguments\nusage: " << argv[0] <<
+	// 		" ./where_is_local_config ./where_is_remote_config ./where_to_put_the_log_file(default: ./log)\n";
+	// }
+	//
+	// if (argc == 4)
+	// {
+	// 	proxy::logger_manager::instance().set_all_log_directory(argv[3]);
+	// }
+	//
+	// proxy::launcher::start(argv[1], argv[2]);
 
-	const std::string_view local_host   = argv[1];
-	const auto             local_port   = static_cast<proxy::port_type>(std::strtol(argv[2], nullptr, 10));
-	const std::string_view forward_host = argv[3];
-	const auto             forward_port = static_cast<proxy::port_type>(std::strtol(argv[4], nullptr, 10));
-
-	std::cout << "forward " << local_host << ':' << local_port << " to " << forward_host << ':' << forward_port <<
-		'\n';
-
-	try
-	{
-		proxy::io_service_type io_service;
-		proxy::acceptor        acceptor{io_service, local_host, local_port, forward_host, forward_port};
-
-		if (!acceptor.connect())
-		{
-			std::cerr << "setup acceptor failed\n";
-			return -1;
-		}
-
-		io_service.run();
-	}
-	catch (const std::exception& e)
-	{
-		std::cerr << "Error: " << e.what() << '\n';
-		return -1;
-	}
+	proxy::launcher::start(".\\conf\\local.json", ".\\conf\\remote.json");
 
 	return 0;
-}
-*/
-
-int main()
-{
-	std::cout << "hello";
 }

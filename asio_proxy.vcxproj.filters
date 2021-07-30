@@ -14,15 +14,6 @@
     <ClCompile Include="main.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="bridge.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="acceptor.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="validator.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="common\io_context_pool.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -58,18 +49,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="def.hpp">
-      <Filter>inc</Filter>
-    </ClInclude>
-    <ClInclude Include="bridge.hpp">
-      <Filter>inc</Filter>
-    </ClInclude>
-    <ClInclude Include="acceptor.hpp">
-      <Filter>inc</Filter>
-    </ClInclude>
-    <ClInclude Include="validator.hpp">
-      <Filter>inc</Filter>
-    </ClInclude>
     <ClInclude Include="common\address.hpp">
       <Filter>inc</Filter>
     </ClInclude>
@@ -125,6 +104,9 @@
       <Filter>inc</Filter>
     </ClInclude>
     <ClInclude Include="udp\udp_session_manager.hpp">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="logger\log_forward.hpp">
       <Filter>inc</Filter>
     </ClInclude>
   </ItemGroup>

@@ -6,21 +6,22 @@
 namespace proxy::tcp
 {
 	tcp_session_manager::tcp_session_manager(
-		const common::address::port_type listen_port,
-		common::forward_addresses        target_addresses,
-		const size_type                  pool_size)
+		const common::address&    listen_address,
+		common::forward_addresses target_addresses,
+		const size_type           pool_size)
 		: io_context_pool_(pool_size),
 		target_addresses_(std::move(target_addresses)),
 		acceptor_(
 				io_context_pool_.get_io_context().operator*(),
-				boost::asio::ip::tcp::endpoint(boost::asio::ip::make_address("127.0.0.1"), listen_port)
+				tcp_socket::make_endpoint(listen_address)
 				) { }
 
 	void tcp_session_manager::run()
 	{
 		start_acceptor();
 
-		log_info(std::format("TCP connection is working -> listen port: {}", acceptor_.local_endpoint().port()));
+		log_info(std::format("TCP connection is working -> listening: {}",
+							tcp_socket::make_address(acceptor_.local_endpoint()).to_string()));
 
 		io_context_pool_.run();
 	}
