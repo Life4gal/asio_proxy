@@ -17,7 +17,7 @@ namespace proxy::tcp
 		return client_socket_;
 	}
 
-	void tcp_session::start(const forward_addresses& target_addresses)
+	void tcp_session::start(const forward_addresses_type& target_addresses)
 	{
 		log_info(std::format("client connection received: [{}]", client_socket_.get_session_id()));
 
@@ -31,7 +31,7 @@ namespace proxy::tcp
 		}
 	}
 
-	bool tcp_session::connect_target_server(const forward_addresses& target_addresses)
+	bool tcp_session::connect_target_server(const forward_addresses_type& target_addresses)
 	{
 		for (const auto& address : target_addresses)
 		{

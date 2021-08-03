@@ -18,6 +18,8 @@ namespace proxy::udp
 		using buffer_type = socket_type::buffer_type;
 		using timer_type = boost::asio::deadline_timer;
 
+		using forward_addresses_type = common::forward_addresses;
+
 		// using duration_type = task_timer<boost::posix_time::seconds>::timer_duration_type;
 		// constexpr static duration_type statistics_interval = boost::posix_time::seconds{30 * 60};
 
@@ -26,12 +28,12 @@ namespace proxy::udp
 		constexpr static duration_type heartbeat_interval = 8 * 60;
 
 		explicit udp_session(
-			io_context_type&          io_context,
-			const address_type&       listen_address,
-			common::forward_addresses target_addresses,
-			udp_session_manager&      manager);
+			io_context_type&       io_context,
+			const address_type&    listen_address,
+			forward_addresses_type target_addresses,
+			udp_session_manager&   manager);
 
-		void send_to_target(const buffer_type& buffer, size_type size);
+		void send_to_target(const socket_type& client, size_type size);
 
 		void async_receive_target();
 
@@ -44,8 +46,8 @@ namespace proxy::udp
 
 		socket_type target_socket_;
 
-		udp_session_manager&      manager_;
-		common::forward_addresses target_addresses_;
+		udp_session_manager&   manager_;
+		forward_addresses_type target_addresses_;
 
 		bool closed_;
 	};

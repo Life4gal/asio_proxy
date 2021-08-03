@@ -164,6 +164,7 @@
     <ClCompile Include="tcp\tcp_socket.cpp" />
     <ClCompile Include="udp\udp_session.cpp" />
     <ClCompile Include="udp\udp_session_manager.cpp" />
+    <ClCompile Include="udp\udp_socket.cpp" />
     <ClCompile Include="utils\flow_statistics.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="utils\udp_flow_statistics.cpp" />
