@@ -161,6 +161,7 @@
     <ClCompile Include="launcher\launcher.cpp" />
     <ClCompile Include="tcp\tcp_session.cpp" />
     <ClCompile Include="tcp\tcp_session_manager.cpp" />
+    <ClCompile Include="tcp\tcp_socket.cpp" />
     <ClCompile Include="udp\udp_session.cpp" />
     <ClCompile Include="udp\udp_session_manager.cpp" />
     <ClCompile Include="utils\flow_statistics.cpp" />

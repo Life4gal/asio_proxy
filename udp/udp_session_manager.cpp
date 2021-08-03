@@ -12,7 +12,7 @@ namespace proxy::udp
 		common::forward_addresses target_addresses,
 		const size_type           pool_size)
 		: io_context_pool_(pool_size),
-		client_socket_(io_context_pool_.get_io_context().operator*(), listen_address),
+		client_socket_(io_context_pool_.get_io_context_handle().operator*(), listen_address),
 		target_addresses_(std::move(target_addresses)) { }
 
 	void udp_session_manager::run()
@@ -135,7 +135,7 @@ namespace proxy::udp
 		if (const auto it = udp_sessions_.find(address.to_string());
 			it == udp_sessions_.end())
 		{
-			ret = std::make_shared<udp_session>(io_context_pool_.get_io_context().operator*(),
+			ret = std::make_shared<udp_session>(io_context_pool_.get_io_context_handle().operator*(),
 												address,
 												target_addresses_,
 												*this);

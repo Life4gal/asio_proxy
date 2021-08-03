@@ -2,9 +2,7 @@
 
 #include "../logger/logger.hpp"
 #include "../utils/tcp_flow_statistics.hpp"
-#include "../utils/utils.hpp"
 #include <format>
-#include <boost/asio/write.hpp>
 
 namespace proxy::tcp
 {
@@ -19,7 +17,7 @@ namespace proxy::tcp
 		return client_socket_;
 	}
 
-	void tcp_session::start(const common::forward_addresses& target_addresses)
+	void tcp_session::start(const forward_addresses& target_addresses)
 	{
 		log_info(std::format("client connection received: [{}]", client_socket_.get_session_id()));
 
@@ -33,13 +31,11 @@ namespace proxy::tcp
 		}
 	}
 
-	bool tcp_session::connect_target_server(const common::forward_addresses& target_addresses)
+	bool tcp_session::connect_target_server(const forward_addresses& target_addresses)
 	{
-		using namespace boost::asio;
-
 		for (const auto& address : target_addresses)
 		{
-			auto& target = target_socket_stream_.emplace_back(io_context_);
+			auto& target = target_sockets_.emplace_back(io_context_);
 
 			try
 			{
@@ -73,57 +69,51 @@ namespace proxy::tcp
 
 	void tcp_session::async_read_client()
 	{
-		using namespace boost::asio;
-		using error_code_t = boost::system::error_code;
+		[[clang::no_destroy]] static std::string statistics_packet{"receive_from_client"};
 
-		client_socket_.socket_.async_read_some(
-												buffer(client_socket_.buffer_),
-												[this](const error_code_t& error_code, const size_type size)
-												{
-													if (closed_)
-													{
-														return;
-													}
+		client_socket_.async_read(
+								[this](const boost::system::error_code& error_code, const size_type size)
+								{
+									if (closed_)
+									{
+										return;
+									}
 
-													if (!error_code)
-													{
-														keep_alive();
+									if (!error_code)
+									{
+										keep_alive();
 
-														log_info(
-																std::format(
-																			"client: [{}] -> size: [{}] -> data: [{}]",
-																			client_socket_.get_session_id(),
-																			size,
-																			utils::bin_to_hex(reinterpret_cast<const
-																								char*>(client_socket_.
-																										buffer_.data()))
-																			)
-																);
+										log_info(
+												std::format(
+															"client: [{}] -> size: [{}] -> sample data: [{}]",
+															client_socket_.get_session_id(),
+															size,
+															client_socket_.sample_buffer()
+															)
+												);
 
-														tcp_flow_statistics::instance().
-															add_packet("receive_from_client");
+										tcp_flow_statistics::instance().add_packet(statistics_packet);
 
-														send_to_target(size);
-														async_read_client();
-													}
-													else if (error_code != error::operation_aborted)
-													{
-														log_warning(
-																	std::format(
-																				"unable to receive client message -> client: [{}] -> error: [{}]",
-																				client_socket_.get_session_id(),
-																				error_code.message()
-																				)
-																	);
-														close();
-													}
-												}
-											);
+										send_to_target(size);
+										async_read_client();
+									}
+									else if (error_code != boost::asio::error::operation_aborted)
+									{
+										log_warning(
+													std::format(
+																"unable to receive client message, close tcp connect -> client: [{}] -> error: [{}]",
+																client_socket_.get_session_id(),
+																error_code.message()
+																)
+													);
+										close();
+									}
+								});
 	}
 
 	void tcp_session::async_read_target()
 	{
-		for (auto& target : target_socket_stream_)
+		for (auto& target : target_sockets_)
 		{
 			async_read_target(target);
 		}
@@ -131,90 +121,81 @@ namespace proxy::tcp
 
 	void tcp_session::async_read_target(socket_type& target)
 	{
-		using namespace boost::asio;
-		using error_code_t = boost::system::error_code;
-		target.socket_.async_read_some(
-										buffer(target.buffer_),
-										[this, &target](const error_code_t& error_code, const size_type size)
-										{
-											if (closed_)
-											{
-												return;
-											}
+		[[clang::no_destroy]] static std::string statistics_packet{"receive_from_target_{}"};
 
-											if (!error_code)
-											{
-												log_info(
-														std::format(
-																	"client: [{}] -> target: [{}] -> size: [{}] -> data: [{}]",
-																	client_socket_.get_session_id(),
-																	target.get_session_id(),
-																	size,
-																	utils::bin_to_hex(reinterpret_cast<const
-																						char*>(client_socket_.
-																								buffer_.data()))
-																	)
-														);
+		target.async_read(
+						[this, &target](const boost::system::error_code& error_code, const size_type size)
+						{
+							if (closed_)
+							{
+								return;
+							}
 
-												tcp_flow_statistics::instance().
-													add_packet(std::format("receive_from_target_{}",
-																			target.get_remote_address_string()));
+							if (!error_code)
+							{
+								log_info(
+										std::format(
+													"client: [{}] -> target: [{}] -> size: [{}] -> sample data: [{}]",
+													client_socket_.get_session_id(),
+													target.get_session_id(),
+													size,
+													client_socket_.sample_buffer())
+										);
 
-												send_to_client(target, size);
-												async_read_target(target);
-											}
-											else if (error_code != error::operation_aborted)
-											{
-												log_warning(
-															std::format(
-																		"unable to receive target message -> client: [{}] -> target: [{}] -> error: [{}]",
-																		client_socket_.get_session_id(),
-																		target.get_session_id(),
-																		error_code.message()
-																		)
-															);
-												close();
-											}
-										}
-									);
+								tcp_flow_statistics::instance().
+									add_packet(std::format(statistics_packet,
+															target.get_remote_address_string()));
+
+								send_to_client(target, size);
+								async_read_target(target);
+							}
+							else if (error_code != boost::asio::error::operation_aborted)
+							{
+								log_warning(
+											std::format(
+														"unable to receive target message -> client: [{}] -> target: [{}] -> error: [{}]",
+														client_socket_.get_session_id(),
+														target.get_session_id(),
+														error_code.message()
+														)
+											);
+								close();
+							}
+						});
 	}
 
 	void tcp_session::send_to_client(socket_type& target, const size_type size)
 	{
-		using namespace boost::asio;
-		using error_code_t = boost::system::error_code;
+		[[clang::no_destroy]] static std::string statistics_packet{"send_to_client"};
 
-		error_code_t error_code;
-		const auto   written = write(client_socket_.socket_, buffer(target.buffer_), error_code);
+		boost::system::error_code error_code;
+		const auto                written = client_socket_.write(target.buffer_, size, error_code);
 
 		if (!error_code)
 		{
 			log_info(
 					std::format(
-								"client: [{}] -> target: [{}] -> size: [{}] -> data: [{}]",
+								"client: [{}] -> target: [{}] -> size: [{}] -> sample data: [{}]",
 								client_socket_.get_session_id(),
 								target.get_session_id(),
 								written,
-								utils::bin_to_hex(reinterpret_cast<const
-													char*>(client_socket_.
-															buffer_.data()))
+								client_socket_.sample_buffer(written % socket_type::basic_sample_size)
 								)
 					);
 
 			tcp_flow_statistics::instance().
-				add_packet("send_to_client");
+				add_packet(statistics_packet);
 		}
 		else
 		{
 			log_warning(
 						std::format(
-									"unable to write client message -> client: [{}] -> target: [{}] -> error: [{}] -> size: [{}] -> data: [{}]",
+									"unable to write client message -> client: [{}] -> target: [{}] -> error: [{}] -> size: [{}] -> sample data: [{}]",
 									client_socket_.get_session_id(),
 									target.get_session_id(),
 									error_code.message(),
 									size,
-									utils::bin_to_hex(reinterpret_cast<const
-														char*>(client_socket_.buffer_.data()))
+									client_socket_.sample_buffer()
 									)
 						);
 		}
@@ -222,42 +203,38 @@ namespace proxy::tcp
 
 	void tcp_session::send_to_target(const size_type size)
 	{
-		using namespace boost::asio;
-		using error_code_t = boost::system::error_code;
+		[[clang::no_destroy]] static std::string statistics_packet{"send_to_target_{}"};
 
-		for (auto& target : target_socket_stream_)
+		for (auto& target : target_sockets_)
 		{
-			error_code_t error_code;
-			const auto   written = write(client_socket_.socket_, buffer(target.buffer_), error_code);
+			boost::system::error_code error_code;
+			const auto                written = target.write(client_socket_.buffer_, size, error_code);
 
 			if (!error_code)
 			{
 				log_info(
 						std::format(
-									"client: [{}] -> target: [{}] -> size: [{}] -> data: [{}]",
+									"client: [{}] -> target: [{}] -> size: [{}] -> sample data: [{}]",
 									client_socket_.get_session_id(),
 									target.get_session_id(),
 									written,
-									utils::bin_to_hex(reinterpret_cast<const
-														char*>(client_socket_.
-																buffer_.data()))
+									client_socket_.sample_buffer(written % socket_type::basic_sample_size)
 									)
 						);
 
 				tcp_flow_statistics::instance().
-					add_packet(std::format("send_to_target_{}", target.get_remote_address_string()));
+					add_packet(std::format(statistics_packet, target.get_remote_address_string()));
 			}
 			else
 			{
 				log_warning(
 							std::format(
-										"unable to write target message -> client: [{}] target: [{}] -> error: [{}] -> size: [{}] -> data: [{}]",
+										"unable to write target message -> client: [{}] target: [{}] -> error: [{}] -> size: [{}] -> sample data: [{}]",
 										client_socket_.get_session_id(),
 										target.get_session_id(),
 										error_code.message(),
 										size,
-										utils::bin_to_hex(reinterpret_cast<const
-															char*>(client_socket_.buffer_.data()))
+										client_socket_.sample_buffer()
 										)
 							);
 			}
@@ -266,23 +243,25 @@ namespace proxy::tcp
 
 	void tcp_session::keep_alive()
 	{
-		using error_code_t = boost::system::error_code;
-
 		try
 		{
+			auto dummy = shared_from_this();
+
 			heartbeat_timer_.expires_from_now(static_cast<boost::posix_time::seconds>(heartbeat_interval));
 			heartbeat_timer_.async_wait(
-										[self = shared_from_this()](const error_code_t& error_code)
+										[this, dummy](const boost::system::error_code& error_code)
 										{
-											if (!self->closed_ && !error_code)
+											if (!closed_ && !error_code)
 											{
 												log_warning(
 															std::format(
 																		"[{}] seconds did not receive any information, close the tcp connection -> client: [{}]",
 																		heartbeat_interval,
-																		self->client_socket_.get_session_id()));
-												self->close();
+																		client_socket_.get_session_id()));
+												close();
 											}
+
+											(void)dummy;
 										});
 		}
 		catch (const std::exception& e)
@@ -314,26 +293,16 @@ namespace proxy::tcp
 
 	void tcp_session::close_target_connection()
 	{
-		for (auto& target : target_socket_stream_)
+		for (auto& target : target_sockets_)
 		{
-			if (auto& socket = target.socket_; socket.is_open())
-			{
-				boost::system::error_code dummy;
-				socket.shutdown(boost::asio::socket_base::shutdown_both, dummy);
-				socket.close(dummy);
-			}
+			target.close();
 		}
 
-		target_socket_stream_.clear();
+		target_sockets_.clear();
 	}
 
 	void tcp_session::close_client_connection()
 	{
-		if (auto& socket = client_socket_.socket_; socket.is_open())
-		{
-			boost::system::error_code dummy;
-			socket.shutdown(boost::asio::socket_base::shutdown_both, dummy);
-			socket.close(dummy);
-		}
+		client_socket_.close();
 	}
 }

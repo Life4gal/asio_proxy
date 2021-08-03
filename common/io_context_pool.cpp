@@ -50,7 +50,7 @@ namespace proxy::common
 		}
 	}
 
-	io_context_pool::io_context_handle_type& io_context_pool::get_io_context()
+	io_context_pool::io_context_handle_type& io_context_pool::get_io_context_handle()
 	{
 		// Use a round-robin scheme to choose the next io_context to use.
 		auto& io_context = io_contexts_[next_valid_context_];
@@ -60,5 +60,10 @@ namespace proxy::common
 			next_valid_context_ = 0;
 		}
 		return io_context;
+	}
+
+	io_context_pool::io_context_type& io_context_pool::get_io_context()
+	{
+		return get_io_context_handle().operator*();
 	}
 }

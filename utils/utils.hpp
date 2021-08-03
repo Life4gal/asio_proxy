@@ -1,38 +1,13 @@
 #pragma once
 
 #include <string>
-#include <iterator>
 
 namespace proxy::utils
 {
-	template <typename ContainerType>
-	void split(
-		std::back_insert_iterator<ContainerType> it,
-		const std::string_view                   str,
-		const std::string_view                   delimiter)
+	template <typename Char, typename Trait = std::char_traits<Char>>
+	std::string bin_to_hex_helper(const std::basic_string_view<Char, Trait> bin, const std::string_view separator)
 	{
-		using string_type = std::string_view;
-		using size_type = string_type::size_type;
-
-		using value_type = typename std::back_insert_iterator<ContainerType>::container_type::value_type;
-
-		size_type current = 0;
-		while (true)
-		{
-			const auto next = str.find(delimiter, current);
-			it              = static_cast<value_type>(str.substr(current, next - current));
-
-			if (next == string_type::npos)
-			{
-				return;
-			}
-			current = next + delimiter.length();
-		}
-	}
-
-	inline std::string bin_to_hex(std::string_view bin, const std::string_view separator = "-")
-	{
-		constexpr auto int_to_char = [](const int v) constexpr -> char
+		constexpr auto int_to_char = [](const auto v) constexpr -> char
 		{
 			if (v < 10)
 			{
@@ -53,5 +28,16 @@ namespace proxy::utils
 		}
 
 		return result;
+	}
+
+	inline std::string bin_to_hex(const std::string_view bin, const std::string_view separator = "-")
+	{
+		return bin_to_hex_helper<char>(bin, separator);
+	}
+
+	inline std::string bin_to_hex(const std::basic_string_view<unsigned char> bin,
+								const std::string_view                        separator = "-")
+	{
+		return bin_to_hex_helper<unsigned char>(bin, separator);
 	}
 }

@@ -13,91 +13,58 @@ namespace proxy::tcp
 		using io_context_type = boost::asio::io_context;
 		using endpoint_type = boost::asio::ip::tcp::endpoint;
 		using size_type = size_t;
+		using value_type = unsigned char;
 		template <size_type N>
-		using stream_type = std::array<unsigned char, N>;
+		using stream_type = std::array<value_type, N>;
 
-		constexpr static size_type buffer_size = 1460; // MTU=MSS+TCP Header+IP Header. 1500=1460+20+20
+		constexpr static size_type buffer_size       = 1460; // MTU=MSS+TCP Header+IP Header. 1500=1460+20+20
+		constexpr static size_type basic_sample_size = 16;
+
 		using buffer_type = stream_type<buffer_size>;
 
 		using address_type = common::address;
 
-		explicit tcp_socket(
-			io_context_type& io_context
-			)
-			: socket_(io_context), buffer_() { }
+		explicit tcp_socket(io_context_type& io_context);
 
-		void connect(const address_type& address)
-		{
-			socket_.connect(make_endpoint(address));
-		}
+		void connect(const address_type& address);
 
-		void connect(const endpoint_type& endpoint)
-		{
-			socket_.connect(endpoint);
-		}
+		void connect(const endpoint_type& endpoint);
 
-		[[nodiscard]] address_type get_remote_address() const
-		{
-			if (socket_.is_open())
+		bool close(boost::system::error_code& shutdown_ec, boost::system::error_code& close_ec);
+
+		void close();
+
+		template <typename Handler>
+			requires requires(Handler&& h)
 			{
-				try
 				{
-					return make_address(socket_.remote_endpoint());
-				}
-				catch (const std::exception&) { }
+					h(std::declval<const boost::system::error_code&>(), std::declval<size_type>())
+				} -> std::same_as<void>;
 			}
-
-			return {};
-		}
-
-		[[nodiscard]] std::string get_remote_address_string() const
+		void async_read(Handler&& handler)
 		{
-			return get_remote_address().to_string();
+			socket_.async_read_some(boost::asio::buffer(buffer_), std::forward<Handler>(handler));
 		}
 
-		[[nodiscard]] address_type get_local_address() const
-		{
-			if (socket_.is_open())
-			{
-				try
-				{
-					return make_address(socket_.local_endpoint());
-				}
-				catch (const std::exception&) {}
-			}
+		size_type write(const buffer_type& buffer, size_type max_size_in_bytes, boost::system::error_code& error_code);
 
-			return {};
-		}
+		[[nodiscard]] std::string sample_buffer(size_type size = basic_sample_size) const;
 
-		[[nodiscard]] std::string get_local_address_string() const
-		{
-			return get_local_address().to_string();
-		}
+		[[nodiscard]] address_type get_remote_address() const;
 
-		[[nodiscard]] std::string get_session_id() const
-		{
-			return std::format("local: {} - remote: {}",
-								get_local_address_string(),
-								get_remote_address_string());
-		}
+		[[nodiscard]] std::string get_remote_address_string() const;
+
+		[[nodiscard]] address_type get_local_address() const;
+
+		[[nodiscard]] std::string get_local_address_string() const;
+
+		[[nodiscard]] std::string get_session_id() const;
 
 		socket_type socket_;
 		buffer_type buffer_;
 
-		static endpoint_type make_endpoint(const address_type& address)
-		{
-			return boost::asio::ip::tcp::endpoint(
-												boost::asio::ip::make_address(address.ip),
-												address.port
-												);
-		}
+		static endpoint_type make_endpoint(const address_type& address);
 
-		static address_type make_address(const endpoint_type& endpoint)
-		{
-			return {
-				.ip = endpoint.address().to_string(),
-				.port = endpoint.port()
-			};
-		}
+		static address_type make_address(const endpoint_type& endpoint);
 	};
 }

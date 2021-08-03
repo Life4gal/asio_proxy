@@ -14,8 +14,10 @@ namespace proxy::tcp
 
 		using io_context_type = socket_type::io_context_type;
 		using size_type = socket_type::size_type;
-		using socket_stream_type = std::vector<socket_type>;
+		using sockets_type = std::vector<socket_type>;
 		using timer_type = boost::asio::deadline_timer;
+
+		using forward_addresses = common::forward_addresses;
 
 		// using duration_type = task_timer<boost::posix_time::seconds>::timer_duration_type;
 		// constexpr static duration_type statistics_interval = boost::posix_time::seconds{30 * 60};
@@ -28,10 +30,10 @@ namespace proxy::tcp
 
 		socket_type& get_client_socket();
 
-		void start(const common::forward_addresses& target_addresses);
+		void start(const forward_addresses& target_addresses);
 
 	private:
-		bool connect_target_server(const common::forward_addresses& target_addresses);
+		bool connect_target_server(const forward_addresses& target_addresses);
 
 		void async_read_client();
 		void async_read_target();
@@ -48,8 +50,8 @@ namespace proxy::tcp
 		io_context_type& io_context_;
 		timer_type       heartbeat_timer_;
 
-		socket_type        client_socket_;
-		socket_stream_type target_socket_stream_;
+		socket_type  client_socket_;
+		sockets_type target_sockets_;
 
 		bool closed_;
 	};

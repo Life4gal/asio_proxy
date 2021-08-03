@@ -47,6 +47,9 @@
     <ClCompile Include="udp\udp_session_manager.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="tcp\tcp_socket.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common\address.hpp">

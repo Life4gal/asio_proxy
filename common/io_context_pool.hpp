@@ -30,7 +30,8 @@ namespace proxy::common
 		void shutdown();
 
 		// Get an io_context to use.
-		io_context_handle_type& get_io_context();
+		io_context_handle_type& get_io_context_handle();
+		io_context_type&        get_io_context();
 
 	private:
 		// The pool of io_contexts.

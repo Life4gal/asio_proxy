@@ -12,8 +12,8 @@ namespace proxy::tcp
 		: io_context_pool_(pool_size),
 		target_addresses_(std::move(target_addresses)),
 		acceptor_(
-				io_context_pool_.get_io_context().operator*(),
-				tcp_socket::make_endpoint(listen_address)
+				io_context_pool_.get_io_context_handle().operator*(),
+				tcp_session::socket_type::make_endpoint(listen_address)
 				) { }
 
 	void tcp_session_manager::run()
@@ -21,14 +21,14 @@ namespace proxy::tcp
 		start_acceptor();
 
 		log_info(std::format("TCP connection is working -> listening: {}",
-							tcp_socket::make_address(acceptor_.local_endpoint()).to_string()));
+							tcp_session::socket_type::make_address(acceptor_.local_endpoint()).to_string()));
 
 		io_context_pool_.run();
 	}
 
 	void tcp_session_manager::start_acceptor()
 	{
-		auto session = std::make_shared<tcp_session>(io_context_pool_.get_io_context().operator*());
+		auto session = std::make_shared<tcp_session>(io_context_pool_.get_io_context());
 
 		acceptor_.async_accept(
 								session->get_client_socket().socket_,
