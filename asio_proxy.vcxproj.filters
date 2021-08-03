@@ -121,9 +121,9 @@
     <None Include=".gitignore" />
     <None Include="conf\local.json" />
     <None Include="conf\remote.json" />
-    <None Include="udp\ReadMe.md" />
+    <None Include="ReadMe.md" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="udp\license.txt" />
+    <Text Include="license.txt" />
   </ItemGroup>
 </Project>
