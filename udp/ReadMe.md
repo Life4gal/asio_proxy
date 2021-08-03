@@ -1,0 +1,1 @@
+# just to learn boost::asio, I don't provide any guarantees or take any responsibility for any other uses :)
