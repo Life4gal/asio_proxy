@@ -24,7 +24,7 @@ namespace proxy::logger
 		constexpr static log_level this_log_level = Level;
 		constexpr static size_type max_file_size  = MaxFileSize;
 
-		inline static std::string log_suffix = ".txt";
+		[[clang::no_destroy]] inline static std::string log_suffix = ".txt";
 
 		logger_proxy()
 			: current_file_size_(0) {}
@@ -35,11 +35,19 @@ namespace proxy::logger
 			set_log_directory(output_dir);
 		}
 
-		~logger_proxy()
+		~logger_proxy() noexcept
 		{
-			if (file_handle_.is_open())
+			while (true)
 			{
-				file_handle_.close();
+				try
+				{
+					if (file_handle_.is_open())
+					{
+						file_handle_.close();
+					}
+					break;
+				}
+				catch (const std::exception&) {}
 			}
 		}
 
@@ -54,7 +62,7 @@ namespace proxy::logger
 			directory_path_.append(log_level_to_string(this_log_level));
 		}
 
-		void write(const std::string_view context)
+		void write(const std::string_view context, const bool send_to_console)
 		{
 			std::call_once(
 							flag_,
@@ -67,6 +75,11 @@ namespace proxy::logger
 															directory_path_.string());
 								}
 							});
+
+			if (send_to_console)
+			{
+				write_console(context);
+			}
 
 			if (!is_file_valid())
 			{
@@ -112,8 +125,12 @@ namespace proxy::logger
 		void write_file(const std::string_view context)
 		{
 			file_handle_ << context << '\n';
-			std::cout << context << '\n';
 			current_file_size_ += context.length();
+		}
+
+		static void write_console(const std::string_view context)
+		{
+			std::cout << context << '\n';
 		}
 
 		void close_file()

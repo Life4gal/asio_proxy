@@ -60,6 +60,11 @@ namespace proxy
 			level_ = static_cast<logger::log_level>(level);
 		}
 
+		void set_send_to_console(const bool send)
+		{
+			send_to_console_ = send;
+		}
+
 		template <const logger::log_level Level>
 		void write(
 			std::string_view            context,
@@ -72,15 +77,15 @@ namespace proxy
 													location.line(),
 													context); Level == logger::log_level::info)
 				{
-					info_.write(text);
+					info_.write(text, send_to_console_);
 				}
 				else if constexpr (Level == logger::log_level::warning)
 				{
-					warning_.write(text);
+					warning_.write(text, send_to_console_);
 				}
 				else if constexpr (Level == logger::log_level::error)
 				{
-					error_.write(text);
+					error_.write(text, send_to_console_);
 				}
 				else
 				{
@@ -101,6 +106,8 @@ namespace proxy
 		logger::logger_proxy<logger::log_level::info, info_max_file_size>       info_{"log"};
 		logger::logger_proxy<logger::log_level::warning, warning_max_file_size> warning_{"log"};
 		logger::logger_proxy<logger::log_level::error, error_max_file_size>     error_{"log"};
+
+		bool send_to_console_{false};
 	};
 
 	template <const logger::log_level Level>

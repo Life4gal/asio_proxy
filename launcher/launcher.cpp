@@ -21,6 +21,7 @@ namespace proxy
 		}
 
 		logger_manager::instance().set_log_level(log_level);
+		logger_manager::instance().set_send_to_console(true);
 
 		if (type == "tcp")
 		{

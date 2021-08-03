@@ -119,5 +119,7 @@
   <ItemGroup>
     <None Include=".gitattributes" />
     <None Include=".gitignore" />
+    <None Include="conf\local.json" />
+    <None Include="conf\remote.json" />
   </ItemGroup>
 </Project>

@@ -1,17 +1,17 @@
 #pragma once
 
 #include <string>
-#include <boost/dll.hpp>
+// #include <boost/dll.hpp>
 #include <chrono>
 #include <filesystem>
 
 namespace proxy::logger
 {
-	inline std::string get_current_exe_name()
-	{
-		// todo: a better way
-		return boost::dll::program_location().filename().string();
-	}
+	// inline std::string get_current_exe_name()
+	// {
+	// 	// todo: a better way
+	// 	return boost::dll::program_location().filename().string();
+	// }
 
 	// 1970-1-1 00:00:00
 	inline std::string get_current_time_ms()

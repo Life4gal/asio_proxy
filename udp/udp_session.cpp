@@ -46,7 +46,7 @@ namespace proxy::udp
 									)
 						);
 
-				udp_flow_statistics::instance().add_packet(std::format(statistics_packet, address));
+				udp_flow_statistics::instance().add_packet(std::format(statistics_packet, address.to_string()));
 			}
 			catch (const std::exception& e)
 			{
